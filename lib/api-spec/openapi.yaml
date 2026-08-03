@@ -1,0 +1,917 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: DMIMO Architectures API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: projects
+    description: Architecture projects
+  - name: blogs
+    description: Blog posts
+  - name: team
+    description: Team members
+  - name: settings
+    description: Site settings
+  - name: inquiries
+    description: Contact inquiries
+  - name: admin
+    description: Admin authentication
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # --- PROJECTS ---
+  /projects:
+    get:
+      operationId: listProjects
+      tags: [projects]
+      summary: List all projects
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [published, draft]
+      responses:
+        "200":
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+    post:
+      operationId: createProject
+      tags: [projects]
+      summary: Create a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+      responses:
+        "201":
+          description: Created project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+
+  /projects/{id}:
+    get:
+      operationId: getProject
+      tags: [projects]
+      summary: Get a project by ID or slug
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateProject
+      tags: [projects]
+      summary: Update a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectUpdate"
+      responses:
+        "200":
+          description: Updated project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteProject
+      tags: [projects]
+      summary: Delete a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  # --- BLOGS ---
+  /blogs:
+    get:
+      operationId: listBlogs
+      tags: [blogs]
+      summary: List all blog posts
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [published, draft]
+      responses:
+        "200":
+          description: List of blog posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Blog"
+    post:
+      operationId: createBlog
+      tags: [blogs]
+      summary: Create a blog post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlogInput"
+      responses:
+        "201":
+          description: Created blog post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Blog"
+
+  /blogs/{id}:
+    get:
+      operationId: getBlog
+      tags: [blogs]
+      summary: Get a blog post by ID or slug
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Blog post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Blog"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateBlog
+      tags: [blogs]
+      summary: Update a blog post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlogUpdate"
+      responses:
+        "200":
+          description: Updated blog post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Blog"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteBlog
+      tags: [blogs]
+      summary: Delete a blog post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  # --- TEAM ---
+  /team:
+    get:
+      operationId: listTeamMembers
+      tags: [team]
+      summary: List team members
+      responses:
+        "200":
+          description: List of team members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamMember"
+    post:
+      operationId: createTeamMember
+      tags: [team]
+      summary: Create a team member
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamMemberInput"
+      responses:
+        "201":
+          description: Created team member
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamMember"
+
+  /team/{id}:
+    get:
+      operationId: getTeamMember
+      tags: [team]
+      summary: Get a team member
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Team member
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamMember"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateTeamMember
+      tags: [team]
+      summary: Update a team member
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamMemberUpdate"
+      responses:
+        "200":
+          description: Updated team member
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamMember"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteTeamMember
+      tags: [team]
+      summary: Delete a team member
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # --- SETTINGS ---
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get site settings
+      responses:
+        "200":
+          description: Site settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+    patch:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update site settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsUpdate"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+
+  # --- INQUIRIES ---
+  /inquiries:
+    get:
+      operationId: listInquiries
+      tags: [inquiries]
+      summary: List all contact inquiries (admin)
+      responses:
+        "200":
+          description: List of inquiries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Inquiry"
+    post:
+      operationId: createInquiry
+      tags: [inquiries]
+      summary: Submit a contact inquiry (public)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InquiryInput"
+      responses:
+        "201":
+          description: Inquiry submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Inquiry"
+
+  /inquiries/{id}:
+    patch:
+      operationId: updateInquiry
+      tags: [inquiries]
+      summary: Update inquiry status (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InquiryUpdate"
+      responses:
+        "200":
+          description: Updated inquiry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Inquiry"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteInquiry
+      tags: [inquiries]
+      summary: Delete an inquiry (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # --- ADMIN AUTH ---
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAuthStatus"
+        "401":
+          description: Invalid credentials
+
+  /admin/logout:
+    post:
+      operationId: adminLogout
+      tags: [admin]
+      summary: Admin logout
+      responses:
+        "200":
+          description: Logged out
+
+  /admin/me:
+    get:
+      operationId: adminMe
+      tags: [admin]
+      summary: Get current admin auth status
+      responses:
+        "200":
+          description: Auth status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAuthStatus"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Project:
+      type: object
+      required: [id, title, slug, category, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        slug:
+          type: string
+        category:
+          type: string
+        location:
+          type: ["string", "null"]
+        year:
+          type: ["string", "null"]
+        area:
+          type: ["string", "null"]
+        client:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [published, draft]
+        featured:
+          type: boolean
+        shortDescription:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        challenge:
+          type: ["string", "null"]
+        solution:
+          type: ["string", "null"]
+        coverImage:
+          type: ["string", "null"]
+        images:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    ProjectInput:
+      type: object
+      required: [title, category]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        slug:
+          type: string
+        category:
+          type: string
+        location:
+          type: string
+        year:
+          type: string
+        area:
+          type: string
+        client:
+          type: string
+        status:
+          type: string
+          enum: [published, draft]
+        featured:
+          type: boolean
+        shortDescription:
+          type: string
+        description:
+          type: string
+        challenge:
+          type: string
+        solution:
+          type: string
+        coverImage:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+
+    ProjectUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        slug:
+          type: string
+        category:
+          type: string
+        location:
+          type: string
+        year:
+          type: string
+        area:
+          type: string
+        client:
+          type: string
+        status:
+          type: string
+          enum: [published, draft]
+        featured:
+          type: boolean
+        shortDescription:
+          type: string
+        description:
+          type: string
+        challenge:
+          type: string
+        solution:
+          type: string
+        coverImage:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+
+    Blog:
+      type: object
+      required: [id, title, slug, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: ["string", "null"]
+        content:
+          type: ["string", "null"]
+        coverImage:
+          type: ["string", "null"]
+        author:
+          type: ["string", "null"]
+        category:
+          type: ["string", "null"]
+        tags:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [published, draft]
+        featured:
+          type: boolean
+        readTime:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    BlogInput:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        slug:
+          type: string
+        excerpt:
+          type: string
+        content:
+          type: string
+        coverImage:
+          type: string
+        author:
+          type: string
+        category:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [published, draft]
+        featured:
+          type: boolean
+        readTime:
+          type: integer
+
+    BlogUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        slug:
+          type: string
+        excerpt:
+          type: string
+        content:
+          type: string
+        coverImage:
+          type: string
+        author:
+          type: string
+        category:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [published, draft]
+        featured:
+          type: boolean
+        readTime:
+          type: integer
+
+    TeamMember:
+      type: object
+      required: [id, name, role, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        role:
+          type: string
+        bio:
+          type: ["string", "null"]
+        photo:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        linkedin:
+          type: ["string", "null"]
+        instagram:
+          type: ["string", "null"]
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    TeamMemberInput:
+      type: object
+      required: [name, role]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        role:
+          type: string
+        bio:
+          type: string
+        photo:
+          type: string
+        email:
+          type: string
+        linkedin:
+          type: string
+        instagram:
+          type: string
+        sortOrder:
+          type: integer
+
+    TeamMemberUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        role:
+          type: string
+        bio:
+          type: string
+        photo:
+          type: string
+        email:
+          type: string
+        linkedin:
+          type: string
+        instagram:
+          type: string
+        sortOrder:
+          type: integer
+
+    Settings:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: integer
+        siteName:
+          type: ["string", "null"]
+        logoUrl:
+          type: ["string", "null"]
+        faviconUrl:
+          type: ["string", "null"]
+        tagline:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        instagram:
+          type: ["string", "null"]
+        linkedin:
+          type: ["string", "null"]
+        twitter:
+          type: ["string", "null"]
+        facebook:
+          type: ["string", "null"]
+        metaTitle:
+          type: ["string", "null"]
+        metaDescription:
+          type: ["string", "null"]
+
+    SettingsUpdate:
+      type: object
+      properties:
+        siteName:
+          type: string
+        logoUrl:
+          type: string
+        faviconUrl:
+          type: string
+        tagline:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        instagram:
+          type: string
+        linkedin:
+          type: string
+        twitter:
+          type: string
+        facebook:
+          type: string
+        metaTitle:
+          type: string
+        metaDescription:
+          type: string
+
+    Inquiry:
+      type: object
+      required: [id, name, email, message, status, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        subject:
+          type: ["string", "null"]
+        projectType:
+          type: ["string", "null"]
+        message:
+          type: string
+        status:
+          type: string
+          enum: [new, read, replied, archived]
+        createdAt:
+          type: string
+
+    InquiryInput:
+      type: object
+      required: [name, email, message]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+        phone:
+          type: string
+        subject:
+          type: string
+        projectType:
+          type: string
+        message:
+          type: string
+          minLength: 1
+
+    InquiryUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [new, read, replied, archived]
+
+    AdminLoginInput:
+      type: object
+      required: [password]
+      properties:
+        password:
+          type: string
+
+    AdminAuthStatus:
+      type: object
+      required: [authenticated]
+      properties:
+        authenticated:
+          type: boolean
