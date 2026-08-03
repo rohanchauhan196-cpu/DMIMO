@@ -1,8 +1,7 @@
 {
   "version": 2,
-  "framework": "vite",
   "buildCommand": "pnpm --filter @workspace/dmimo run build",
-  "outputDirectory": "artifacts/dmimo/dist/public",
+  "outputDirectory": "artifacts/dmimo/dist",
   "routes": [
     {
       "handle": "filesystem"
