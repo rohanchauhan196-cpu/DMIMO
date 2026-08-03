@@ -5,12 +5,12 @@ import pinoHttpImport from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
-const pinoHttp = (typeof pinoHttpImport === "function" ? pinoHttpImport : (pinoHttpImport as any).default || (pinoHttpImport as any).pinoHttp) as typeof pinoHttpImport;
+const pinoHttpFn: any = (pinoHttpImport as any).default || (pinoHttpImport as any).pinoHttp || pinoHttpImport;
 
 const app: Express = express();
 
 app.use(
-  pinoHttp({
+  pinoHttpFn({
     logger,
     serializers: {
       req(req: any) {
