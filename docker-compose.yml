@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mimo
+      POSTGRES_PASSWORD: mimo
+      POSTGRES_DB: mimo_architects
+    ports:
+      - "5432:5432"
+    volumes:
+      - mimo_pgdata:/var/lib/postgresql/data
+
+volumes:
+  mimo_pgdata:

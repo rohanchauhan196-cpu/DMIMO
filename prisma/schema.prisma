@@ -1,0 +1,187 @@
+// D Mimo Architects — data model
+// Postgres via Prisma. Run `npm run db:push` after setting DATABASE_URL, then `npm run db:seed`.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CategoryType {
+  PROJECT
+  BLOG
+}
+
+enum ProjectStatus {
+  COMPLETED
+  ONGOING
+  CONCEPT
+}
+
+enum AdminRole {
+  ADMIN
+  EDITOR
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  role          AdminRole @default(EDITOR)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Category {
+  id        String       @id @default(cuid())
+  name      String
+  slug      String       @unique
+  type      CategoryType
+  order     Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  projects  Project[]
+  blogs     Blog[]
+
+  @@index([type])
+}
+
+model Project {
+  id               String        @id @default(cuid())
+  title            String
+  slug             String        @unique
+  categoryId       String
+  category         Category      @relation(fields: [categoryId], references: [id])
+  location         String
+  year             Int
+  client           String?
+  architect        String?
+  area             String?
+  status           ProjectStatus @default(COMPLETED)
+  shortDescription String
+  story            String        @db.Text
+  coverImage       String
+  gallery          ProjectImage[]
+  featured         Boolean       @default(false)
+  published        Boolean       @default(true)
+  order            Int           @default(0)
+  seoTitle         String?
+  seoDescription   String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([categoryId])
+  @@index([published, featured])
+}
+
+model ProjectImage {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  url       String
+  caption   String?
+  layout    String   @default("full") // full | half | large | small
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+}
+
+model Blog {
+  id             String    @id @default(cuid())
+  title          String
+  slug           String    @unique
+  categoryId     String
+  category       Category  @relation(fields: [categoryId], references: [id])
+  author         String    @default("D Mimo Architects")
+  featuredImage  String
+  excerpt        String
+  content        String    @db.Text
+  published      Boolean   @default(true)
+  publishedAt    DateTime  @default(now())
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([categoryId])
+  @@index([published, publishedAt])
+}
+
+model Service {
+  id               String   @id @default(cuid())
+  title            String
+  slug             String   @unique
+  number           String
+  shortDescription String
+  description      String   @db.Text
+  image            String
+  capabilities     String[]
+  process          Json?
+  order            Int      @default(0)
+  published        Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  quote       String   @db.Text
+  clientName  String
+  project     String
+  location    String
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model ContactSubmission {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  company     String?
+  projectType String?
+  location    String?
+  budgetRange String?
+  message     String   @db.Text
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model MediaAsset {
+  id         String   @id @default(cuid())
+  url        String
+  filename   String
+  width      Int?
+  height     Int?
+  size       Int?
+  alt        String?
+  createdAt  DateTime @default(now())
+}
+
+model SiteSettings {
+  id              String   @id @default("singleton")
+  logoUrl         String   @default("/logo.png")
+  email           String   @default("studio@dmimoarchitects.com")
+  phone           String   @default("+91 98100 00000")
+  address         String   @default("4th Floor, Mercer House, Sector 44, Gurugram, Haryana 122003, India")
+  mapEmbedUrl     String?
+  instagramUrl    String   @default("https://instagram.com")
+  linkedinUrl     String   @default("https://linkedin.com")
+  pinterestUrl    String   @default("https://pinterest.com")
+  behanceUrl      String   @default("https://behance.net")
+  footerNote      String   @default("Designing spaces that are built to be experienced.")
+  statProjects    String   @default("20+")
+  statYears       String   @default("10+")
+  statCities      String   @default("8+")
+  statAwards      String   @default("12+")
+  seoDefaultTitle String   @default("D Mimo Architects — Architecture, Interiors & Design")
+  seoDefaultDesc  String   @default("D Mimo Architects is an international studio for architecture, interior design and master planning, creating spaces designed to be experienced.")
+  updatedAt       DateTime @updatedAt
+}

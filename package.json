@@ -1,18 +1,56 @@
 {
-  "name": "workspace",
-  "version": "0.0.0",
-  "license": "MIT",
-  "type": "module",
-  "scripts": {
-    "build": "pnpm --filter @workspace/dmimo run build",
-    "start": "node index.js"
-  },
+  "name": "d-mimo-architects",
+  "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate",
+    "vercel-build": "prisma generate && prisma db push --skip-generate && tsx prisma/seed-once.ts && next build"
+  },
   "dependencies": {
-    "express": "^4.19.2"
+    "@auth/prisma-adapter": "^2.7.4",
+    "@hookform/resolvers": "^3.9.1",
+    "@prisma/client": "^6.9.0",
+    "@tiptap/extension-image": "^2.11.5",
+    "@tiptap/extension-link": "^2.11.5",
+    "@tiptap/extension-placeholder": "^2.11.5",
+    "@tiptap/react": "^2.11.5",
+    "@tiptap/starter-kit": "^2.11.5",
+    "@vercel/blob": "^2.8.2",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^11.18.2",
+    "gsap": "^3.12.7",
+    "lenis": "^1.1.20",
+    "lucide-react": "^0.468.0",
+    "next": "^15.1.4",
+    "next-auth": "5.0.0-beta.25",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "sharp": "^0.33.5",
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
-    "prettier": "^3.8.3",
-    "typescript": "~5.9.3"
+    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.20",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "^15.1.4",
+    "prisma": "^6.9.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
   }
 }
