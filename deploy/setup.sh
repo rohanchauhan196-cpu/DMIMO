@@ -63,6 +63,7 @@ if [[ $FIRST_RUN -eq 1 ]]; then
   if [[ -z "$ADMIN_PASSWORD" ]]; then ADMIN_PASSWORD="$(openssl rand -base64 18 | tr -d '/+=')"; fi
   cat > "$APP_DIR/.env" <<ENV
 DATABASE_URL="postgresql://mimo:${DB_PASS}@localhost:5432/mimo_architects?schema=public"
+DATABASE_URL_UNPOOLED="postgresql://mimo:${DB_PASS}@localhost:5432/mimo_architects?schema=public"
 AUTH_SECRET="$(openssl rand -base64 32)"
 AUTH_TRUST_HOST=true
 NEXTAUTH_URL="${SITE_URL}"
