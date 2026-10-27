@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import ImageUploadField from "@/components/admin/ImageUploadField";
-import { slugify } from "@/lib/utils";
+import { slugify, formatApiError } from "@/lib/utils";
 
 type ServiceFormData = {
   title: string;
@@ -73,10 +73,10 @@ export default function ServiceForm({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    const json = await res.json();
+    const json = await res.json().catch(() => ({ error: `Server error (${res.status})` }));
 
     if (!res.ok) {
-      setError(json.error ?? "Could not save service");
+      setError(formatApiError(json, "Could not save service"));
       setSaving(false);
       return;
     }

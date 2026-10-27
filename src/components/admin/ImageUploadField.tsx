@@ -24,8 +24,11 @@ export default function ImageUploadField({
       const formData = new FormData();
       formData.append("file", file);
       const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Upload failed");
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.data?.url) {
+        if (res.status === 413) throw new Error("Image is too large. Please use an image under 4 MB.");
+        throw new Error(json?.error ?? `Upload failed (${res.status}). Check that Vercel Blob is connected.`);
+      }
       onChange(json.data.url);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");

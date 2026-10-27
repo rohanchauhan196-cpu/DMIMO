@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2, Plus, Trash2, GripVertical } from "lucide-react";
 import ImageUploadField from "@/components/admin/ImageUploadField";
-import { slugify } from "@/lib/utils";
+import { slugify, formatApiError } from "@/lib/utils";
 
 type GalleryItem = { url: string; caption: string; layout: "full" | "half" | "large" | "small" };
 
@@ -105,10 +105,10 @@ export default function ProjectForm({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    const json = await res.json();
+    const json = await res.json().catch(() => ({ error: `Server error (${res.status})` }));
 
     if (!res.ok) {
-      setError(json.error ?? "Could not save project");
+      setError(formatApiError(json, "Could not save project"));
       setSaving(false);
       return;
     }

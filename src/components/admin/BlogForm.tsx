@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import TiptapEditor from "@/components/admin/TiptapEditor";
-import { slugify } from "@/lib/utils";
+import { slugify, formatApiError } from "@/lib/utils";
 
 type BlogFormData = {
   title: string;
@@ -78,10 +78,10 @@ export default function BlogForm({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    const json = await res.json();
+    const json = await res.json().catch(() => ({ error: `Server error (${res.status})` }));
 
     if (!res.ok) {
-      setError(json.error ?? "Could not save blog post");
+      setError(formatApiError(json, "Could not save blog post"));
       setSaving(false);
       return;
     }

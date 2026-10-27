@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Loader2, Check } from "lucide-react";
+import { formatApiError } from "@/lib/utils";
 
 type Settings = {
   logoUrl: string;
@@ -52,9 +53,9 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...data, mapEmbedUrl: data.mapEmbedUrl ?? "" }),
     });
-    const json = await res.json();
+    const json = await res.json().catch(() => ({ error: `Server error (${res.status})` }));
     if (!res.ok) {
-      setError(json.error ?? "Could not save settings");
+      setError(formatApiError(json, "Could not save settings"));
     } else {
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);

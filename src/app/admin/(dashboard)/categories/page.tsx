@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Plus, Trash2, Loader2 } from "lucide-react";
-import { slugify } from "@/lib/utils";
+import { slugify, formatApiError } from "@/lib/utils";
 
 type Category = {
   id: string;
@@ -26,7 +26,7 @@ export default function CategoriesPage() {
   const load = useCallback(async () => {
     setLoading(true);
     const res = await fetch("/api/admin/categories");
-    const json = await res.json();
+    const json = await res.json().catch(() => ({ error: `Server error (${res.status})` }));
     setCategories(json.data ?? []);
     setLoading(false);
   }, []);
@@ -47,7 +47,7 @@ export default function CategoriesPage() {
     });
     const json = await res.json();
     if (!res.ok) {
-      setError(json.error ?? "Could not create category");
+      setError(formatApiError(json, "Could not create category"));
     } else {
       setName("");
       await load();
