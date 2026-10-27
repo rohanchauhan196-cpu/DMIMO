@@ -5,6 +5,11 @@ import JsonLd from "@/components/JsonLd";
 import { getSiteSettings } from "@/lib/data";
 import "./globals.css";
 
+// Every page reads live data from Neon, so render on each request instead of
+// freezing the database content at build time. Without this, changes made in
+// the admin panel never show on the public site until the next redeploy.
+export const dynamic = "force-dynamic";
+
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
