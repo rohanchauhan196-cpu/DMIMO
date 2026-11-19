@@ -12,7 +12,29 @@ const ALLOWED_TYPES: Record<string, string> = {
   "image/png": "png",
   "image/webp": "webp",
   "image/gif": "gif",
+  "image/avif": "avif",
 };
+
+const EXTENSION_TYPES: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  gif: "image/gif",
+  avif: "image/avif",
+};
+
+// Some browsers/OSes send AVIF files with an empty or generic MIME type, so fall back
+// to the file signature (ISO-BMFF "ftyp" box with an avif/avis brand) and the extension.
+function detectType(file: File, buffer: Buffer): string | undefined {
+  if (ALLOWED_TYPES[file.type]) return file.type;
+  if (buffer.length >= 12 && buffer.toString("ascii", 4, 8) === "ftyp") {
+    const brand = buffer.toString("ascii", 8, 12);
+    if (brand === "avif" || brand === "avis") return "image/avif";
+  }
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+  return EXTENSION_TYPES[ext];
+}
 
 // On Vercel, uploads go to Vercel Blob (serverless disks are not persistent) and
 // request bodies are capped at 4.5 MB. On a normal server they are saved to public/uploads.
@@ -30,11 +52,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
-  const extension = ALLOWED_TYPES[file.type];
-  if (!extension) {
-    return NextResponse.json({ error: "Unsupported file type. Use JPEG, PNG, WebP or GIF." }, { status: 415 });
-  }
-
   if (file.size > MAX_SIZE) {
     return NextResponse.json(
       { error: `File is too large. Maximum size is ${MAX_SIZE / (1024 * 1024)}MB.` },
@@ -43,13 +60,21 @@ export async function POST(req: Request) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
+  const contentType = detectType(file, buffer);
+  const extension = contentType ? ALLOWED_TYPES[contentType] : undefined;
+  if (!contentType || !extension) {
+    return NextResponse.json(
+      { error: "Unsupported file type. Use JPEG, PNG, WebP, GIF or AVIF." },
+      { status: 415 },
+    );
+  }
   const filename = `${randomUUID()}.${extension}`;
 
   let url: string;
   if (USE_BLOB) {
     const blob = await put(`uploads/${filename}`, buffer, {
       access: "public",
-      contentType: file.type,
+      contentType,
     });
     url = blob.url;
   } else {

@@ -102,6 +102,14 @@ server {
     # Images uploaded from the admin panel are served straight from disk
     location /uploads/ {
         alias /var/www/dmimo/public/uploads/;
+        # Older Nginx mime.types files lack AVIF, which makes browsers refuse to show it
+        types {
+            image/jpeg jpg jpeg;
+            image/png  png;
+            image/webp webp;
+            image/gif  gif;
+            image/avif avif;
+        }
         expires 30d;
         access_log off;
     }

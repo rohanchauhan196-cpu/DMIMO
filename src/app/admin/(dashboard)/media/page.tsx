@@ -83,7 +83,7 @@ export default function MediaPage() {
           ref={inputRef}
           type="file"
           multiple
-          accept="image/jpeg,image/png,image/webp,image/gif"
+          accept="image/jpeg,image/png,image/webp,image/gif,image/avif,.avif"
           className="hidden"
           onChange={(e) => {
             if (e.target.files?.length) uploadFiles(e.target.files);
